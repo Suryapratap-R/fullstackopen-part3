@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = 'https://fierce-hamlet-07775.herokuapp.com/api/persons'
+const baseUrl = '/api/persons'
 
 const getAll = () => axios.get(baseUrl).then(response => response.data)
 const create = (newRecord) => axios.post(baseUrl, newRecord).then(response => response.data)
