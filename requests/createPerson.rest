@@ -2,6 +2,15 @@ POST http://localhost:3001/api/persons HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Art",
+    "name": "Ardsft",
+    "number": "124234345"
+}
+
+###
+POST https://fierce-hamlet-07775.herokuapp.com/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Ardsft",
     "number": "124234345"
 }
