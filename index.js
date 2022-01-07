@@ -2,7 +2,8 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors');
-const PhoneNumber = require('./models/phonenumber')
+const PhoneNumber = require('./models/phonenumber');
+const { request, response } = require('express');
 
 const app = express()
 
@@ -87,7 +88,6 @@ app.post('/api/persons', (request, response) => {
             error: 'name must be unique'
         })
     } else {
-
         const phone = new PhoneNumber({
             name: body.name,
             number: body.number,
@@ -106,6 +106,22 @@ app.delete('/api/persons/:id', (request, response, next) => {
             response.status(204).end()
         })
         .catch(error=>next(error))
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const personUpdate = {
+        name: request.body.name,
+        number: request.body.number
+    }
+
+    PhoneNumber.findByIdAndUpdate(request.params.id, personUpdate, {new: true}).then(
+        number => {
+            if (number) {
+                response.json(number)
+            } else {
+                response.status(400).send({error: 'invalid id'})
+            }
+        }).catch(error=>next(error))
 })
 
 const unknownEndpoint = (request, response) => {

@@ -75,7 +75,6 @@ const App = () => {
         {
           setPersons(persons.concat(person))
         })
-        
         setNewName('')
         setNewNumber('')
         setNotificationMessage(`Added ${newName}`)
