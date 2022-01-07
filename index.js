@@ -17,6 +17,11 @@ morgan.token('body', req => {
     return ' '
 })
 
+// const errorHandler = (error, request, response, next)=>{
+    
+//     next()
+// }
+
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 let persons = [
@@ -49,18 +54,14 @@ app.get('/info', (request, response) => {
 app.get('/api/persons', (request, response) => {
     PhoneNumber.find({}).then(numbers => {
         response.json(numbers)
-
         })
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
-    if (person) {
-        response.json(person)
-    } else {
-        response.status(404).end()
-    }
+    PhoneNumber.findById(request.params.id).then(number => {
+        response.json(number)
+    }).catch(error=>next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -93,25 +94,23 @@ app.post('/api/persons', (request, response) => {
             console.log(savedNumber);
             response.json(savedNumber)
         })
-        // const person = {
-        //     name: body.name,
-        //     number: body.number,
-        //     id: Math.floor(Math.random() * 100000),
-        // }
-        // persons.concat(person)
     }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(person => person.id !== id)
-    response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+    PhoneNumber.findByIdAndRemove(request.params.id).then(
+        number => {
+            response.status(204).end()
+        })
+        .catch(error=>next(error))
 })
 
 const unknownEndpoint = (request, response) => {
     response.status(404).send({error: 'unknown endpoint'})
 }
 app.use(unknownEndpoint)
+
+// app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT)
