@@ -83,13 +83,22 @@ app.post('/api/persons', (request, response) => {
             error: 'name must be unique'
         })
     } else {
-        const person = {
+
+        const phone = new PhoneNumber({
             name: body.name,
             number: body.number,
-            id: Math.floor(Math.random() * 100000),
-        }
-        persons.concat(person)
-        response.json(person)
+        })
+
+        phone.save().then(savedNumber => {
+            console.log(savedNumber);
+            response.json(savedNumber)
+        })
+        // const person = {
+        //     name: body.name,
+        //     number: body.number,
+        //     id: Math.floor(Math.random() * 100000),
+        // }
+        // persons.concat(person)
     }
 })
 
