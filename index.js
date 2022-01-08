@@ -111,7 +111,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         number: request.body.number
     }
 
-    PhoneNumber.findByIdAndUpdate(request.params.id, personUpdate, {new: true}).then(
+    PhoneNumber.findByIdAndUpdate(request.params.id, personUpdate, {new: true, runValidators: true}).then(
         number => {
             if (number) {
                 response.json(number)

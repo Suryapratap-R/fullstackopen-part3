@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react';
 import phoneService from './services/phonebook';
 
 const NotificationBanner = ({message, messageColor}) => {
@@ -31,6 +31,8 @@ const Filter = ({handleFilterChange}) => <div>
           filter show with <input onChange={handleFilterChange}/>
       </div>
 
+
+
 const PersonForm = (props) =>
       <form onSubmit={props.addNumber}>
         <div>
@@ -51,15 +53,19 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationColor, setNotificationColor] = useState('black')
 
+  const NotificationBannerColorMessage=(message, error=false) => {
+    setNotificationColor(error?'crimson':'green')
+    setNotificationMessage(message)
+    setTimeout(() => {
+      setNotificationMessage(null)
+    }, 6000)
+  }
+
   const deleteWithId = (id) => {
     const confirmDelete = window.confirm(`delete ${persons.find(p=>p.id === id).name}?`)
     if (confirmDelete) {
       phoneService.deleteRecord(id).then(data => { }).catch(err => {
-        setNotificationMessage(`Information of '${persons.find(p=>p.id === id).name}' has already deleted from server`)
-      setNotificationColor('crimson')
-      setTimeout(() => {
-        setNotificationMessage(null)
-      }, 6000)
+        NotificationBannerColorMessage(`Information of '${persons.find(p=>p.id === id).name}' has already deleted from server`, true)
       })
       setPersons(persons.filter(p=>p.id !== id))
     }
@@ -74,14 +80,15 @@ const App = () => {
       .then(person =>
         {
           setPersons(persons.concat(person))
+      })
+        .catch(error => {
+          NotificationBannerColorMessage(error.response.data.error, true)
+          console.log(error.response);
+          console.log(error.response.data.error);
         })
         setNewName('')
-        setNewNumber('')
-        setNotificationMessage(`Added ${newName}`)
-        setNotificationColor('green')
-        setTimeout(() => {
-          setNotificationMessage(null)
-        }, 6000)
+      setNewNumber('')
+      NotificationBannerColorMessage(`Added ${newName}`)
       } else {
         const replace = window.confirm(`${newName} is already added to phone, replace the old number with a new one?`)
       if (replace) {
@@ -89,6 +96,10 @@ const App = () => {
         .then(person =>
         {
           setPersons(persons.map(p=>p.id!==person.id ? p : person))
+        }).catch(error => {
+          NotificationBannerColorMessage(error.response.data.error, true)
+          console.log(error);
+          console.log(error.response.data);
         })
       setNewName('')
       setNewNumber('')

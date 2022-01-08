@@ -13,9 +13,14 @@ const PhoneNumber = new mongoose.Schema({
     name: {
         type: String,
         unique: true,
-        required: true
+        required: true,
+        minlength: 3
     },
-    number: String,
+    number: {
+        type: String,
+        required: true,
+        minlength: 8
+    },
 })
 PhoneNumber.plugin(mongooseUniqueValidator)
 
