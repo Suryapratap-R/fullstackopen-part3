@@ -2,8 +2,11 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors');
+
+
 const PhoneNumber = require('./models/phonenumber');
 const { request, response } = require('express');
+const req = require('express/lib/request');
 
 const app = express()
 
@@ -18,13 +21,7 @@ morgan.token('body', req => {
     return ' '
 })
 
-const errorHandler = (error, request, response, next) => {
-    console.log(error.message);
-    if (error.name === 'CastError') {
-        response.status(400).send({error: 'malformatted id'})
-    }
-    next()
-}
+
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
@@ -68,7 +65,7 @@ app.get('/api/persons/:id', (request, response, next) => {
     }).catch(error=>next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
     if (body.name === undefined && body.number === undefined) {
@@ -96,7 +93,7 @@ app.post('/api/persons', (request, response) => {
         phone.save().then(savedNumber => {
             console.log(savedNumber);
             response.json(savedNumber)
-        })
+        }).catch(error=>next(error))
     }
 })
 
@@ -128,6 +125,17 @@ const unknownEndpoint = (request, response) => {
     response.status(404).send({error: 'unknown endpoint'})
 }
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message);
+    console.log(error.name);
+    if (error.name === 'CastError') {
+        response.status(400).send({error: 'malformatted id'})
+    } else if (error.name === 'ValidationError') {
+        response.status(400).send({ error: error.message })
+    }
+    next()
+}
 
 app.use(errorHandler)
 
